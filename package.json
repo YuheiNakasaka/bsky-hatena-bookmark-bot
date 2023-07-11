@@ -1,0 +1,13 @@
+{
+  "name": "bsky-hatena-bookmark-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "workspaces": [
+    "functions"
+  ],
+  "scripts": {},
+  "dependencies": {
+    "dotenv": "^16.3.1"
+  }
+}
