@@ -16,7 +16,7 @@ const hatenaBookmarkRef = db
   .collection("razokulover");
 
 export const scrapingJob = functions.pubsub
-  .schedule("*/5 * * * *")
+  .schedule("*/05 * * * *")
   .onRun(async (_) => {
     const scrapingBookmarks = async () => {
       const contents = await HatenaBookmarkBot.scrapingBookmarks();

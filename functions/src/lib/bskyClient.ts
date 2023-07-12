@@ -79,7 +79,7 @@ export class BskyClient {
     const encoder = new TextEncoder();
     const text = `${item.comment != "" ? item.comment : "👀"} / "${
       item.title
-    } "`.slice(0, 299);
+    } " `.slice(0, 299);
     const byteStart = encoder.encode(text).byteLength;
     const byteEnd = byteStart + encoder.encode(item.link).byteLength;
     return {
