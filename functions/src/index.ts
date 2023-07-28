@@ -15,8 +15,9 @@ const hatenaBookmarkRef = db
   .doc("hatenaBookmark")
   .collection("razokulover");
 
-export const scrapingJob = functions.pubsub
-  .schedule("*/05 * * * *")
+export const scrapingJob = functions
+  .runWith({ memory: "128MB" })
+  .pubsub.schedule("*/30 * * * *")
   .onRun(async (_) => {
     const scrapingBookmarks = async () => {
       const contents = await HatenaBookmarkBot.scrapingBookmarks();
@@ -30,8 +31,9 @@ export const scrapingJob = functions.pubsub
     }
   });
 
-export const postJob = functions.pubsub
-  .schedule("*/01 * * * *")
+export const postJob = functions
+  .runWith({ memory: "128MB" })
+  .pubsub.schedule("*/05 * * * *")
   .onRun(async (_) => {
     const runHatenaBookmark = async () => {
       const client = await BskyClient.createAgent({
