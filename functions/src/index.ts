@@ -16,7 +16,7 @@ const hatenaBookmarkRef = db
   .collection("razokulover");
 
 export const scrapingJob = functions
-  .runWith({ memory: "128MB" })
+  .runWith({ memory: "256MB" })
   .pubsub.schedule("*/30 * * * *")
   .onRun(async (_) => {
     const scrapingBookmarks = async () => {
@@ -32,7 +32,7 @@ export const scrapingJob = functions
   });
 
 export const postJob = functions
-  .runWith({ memory: "128MB" })
+  .runWith({ memory: "256MB" })
   .pubsub.schedule("*/05 * * * *")
   .onRun(async (_) => {
     const runHatenaBookmark = async () => {
