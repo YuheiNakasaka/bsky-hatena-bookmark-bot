@@ -42,21 +42,25 @@ export class BskyClient {
     return await this.agent.post(postParams);
   }
 
-  public async getOgImageFromUrl(url: string): Promise<Uint8Array> {
-    const resp = await fetch(url);
-    const buffer = await resp.arrayBuffer();
-    const compressedImage = await sharp(buffer)
-      .resize(800, null, {
-        fit: "inside",
-        withoutEnlargement: true,
-      })
-      .jpeg({
-        quality: 80,
-        progressive: true,
-      })
-      .toBuffer();
+  public async getOgImageFromUrl(url: string): Promise<Uint8Array | null> {
+    try {
+      const resp = await fetch(url);
+      const buffer = await resp.arrayBuffer();
+      const compressedImage = await sharp(buffer)
+        .resize(800, null, {
+          fit: "inside",
+          withoutEnlargement: true,
+        })
+        .jpeg({
+          quality: 80,
+          progressive: true,
+        })
+        .toBuffer();
 
-    return new Uint8Array(compressedImage);
+      return new Uint8Array(compressedImage);
+    } catch (e) {
+      return null;
+    }
   }
 
   public async uploadImage({
@@ -101,26 +105,39 @@ export class BskyClient {
   ): Promise<AppBskyFeedPost.Record["embed"] | null> {
     if (item.ogImg && item.ogImg != "") {
       const blob = await this.getOgImageFromUrl(item.ogImg);
-      const uploadedImage = await this.uploadImage({
-        image: blob,
-        encoding: "image/jpeg",
-      });
-      return {
-        $type: "app.bsky.embed.external",
-        external: {
-          uri: item.link,
-          thumb: {
-            $type: "blob",
-            ref: {
-              $link: uploadedImage.ref.toString(),
+      if (blob) {
+        const uploadedImage = await this.uploadImage({
+          image: blob,
+          encoding: "image/jpeg",
+        });
+        const embed: AppBskyFeedPost.Record["embed"] = {
+          $type: "app.bsky.embed.external",
+          external: {
+            uri: item.link,
+            thumb: {
+              $type: "blob",
+              ref: {
+                $link: uploadedImage.ref.toString(),
+              },
+              mimeType: uploadedImage.mimeType,
+              size: uploadedImage.size,
             },
-            mimeType: uploadedImage.mimeType,
-            size: uploadedImage.size,
+            title: item.title,
+            description: item.ogText,
           },
-          title: item.title,
-          description: item.ogText,
-        },
-      };
+        };
+        return embed;
+      } else {
+        const embed: AppBskyFeedPost.Record["embed"] = {
+          $type: "app.bsky.embed.external",
+          external: {
+            uri: item.link,
+            title: item.title,
+            description: item.ogText,
+          },
+        };
+        return embed;
+      }
     }
     return null;
   }
